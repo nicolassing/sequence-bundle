@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="nicolassing_sequence.number_generator" class="Nicolassing\SequenceBundle\NumberGenerator\NumberGenerator">
+            <argument type="service" id="nicolassing_sequence.orm.sequence_repository" />
+            <argument type="service" id="nicolassing_sequence.sequence_factory"/>
+            <argument type="service" id="nicolassing_sequence.object_manager"/>
+        </service>
+
+        <service id="nicolassing_sequence.orm.sequence_repository" class="Doctrine\ORM\EntityRepository">
+            <factory service="doctrine" method="getRepository"/>
+            <argument>%nicolassing_sequence.model.sequence.class%</argument>
+        </service>
+
+        <service id="nicolassing_sequence.sequence_factory" class="Nicolassing\SequenceBundle\Factory\SequenceFactory">
+            <argument>%nicolassing_sequence.model.sequence.class%</argument>
+        </service>
+
+        <service id="nicolassing_sequence.number_assigner" class="Nicolassing\SequenceBundle\NumberAssigner\NumberAssigner">
+            <argument type="service" id="nicolassing_sequence.number_generator"/>
+        </service>
+
+        <service id="nicolassing_sequence.object_manager" class="Doctrine\Common\Persistence\ObjectManager">
+            <factory service="doctrine" method="getManager"/>
+            <argument>%nicolassing_sequence.model_manager.name%</argument>
+        </service>
+
+        <service id="Nicolassing\SequenceBundle\NumberFormatter\NumberFormatterChain"/>
+
+        <service id="nicolassing_sequence.default_number_formatter" class="Nicolassing\SequenceBundle\NumberFormatter\DefaultNumberFormatter">
+            <tag name="nicolassing_sequence.number_formatter" alias="default"/>
+        </service>
+
+        <service id="Nicolassing\SequenceBundle\PrefixFormatter\PrefixFormatterChain"/>
+
+        <service id="nicolassing_sequence.default_prefix_formatter" class="Nicolassing\SequenceBundle\PrefixFormatter\DefaultPrefixFormatter">
+            <tag name="nicolassing_sequence.prefix_formatter" alias="default"/>
+        </service>
+
+        <service id="nicolassing_sequence.date_prefix_formatter" class="Nicolassing\SequenceBundle\PrefixFormatter\DatePrefixFormatter">
+            <tag name="nicolassing_sequence.prefix_formatter" alias="date"/>
+        </service>
+
+        <service id="nicolassing_sequence.slug_prefix_formatter" class="Nicolassing\SequenceBundle\PrefixFormatter\SlugPrefixFormatter">
+            <tag name="nicolassing_sequence.prefix_formatter" alias="slug"/>
+        </service>
+    </services>
+</container>

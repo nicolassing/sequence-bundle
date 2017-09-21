@@ -1,0 +1,47 @@
+{
+  "name": "nicolassing/sequence-bundle",
+  "type": "symfony-bundle",
+  "description": "Nicolassing sequence bundle allow you to create sequential number (eg reference, invoice number, ...)",
+  "keywords": [
+    "sequence",
+    "invoice",
+    "reference"
+  ],
+  "homepage": "http://github.com/nicolassing/NicolassingSequenceBundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Nicolas Assing",
+      "email": "nicolas.assing@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "~7.1",
+    "psr/log": "^1.0",
+    "symfony/config": "^3.0|^4.0",
+    "symfony/debug": "^2.8|^3.0|^4.0",
+    "symfony/dependency-injection": "^3.0|^4.0",
+    "symfony/event-dispatcher": "^3.0|^4.0",
+    "symfony/monolog-bundle": "^3.0|^4.0",
+    "symfony/options-resolver": "^3.0|^4.0",
+    "doctrine/orm": "^2.5",
+    "doctrine/doctrine-bundle": "^1.7"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.8|^5.0",
+    "symfony/http-kernel": "^3.0|^4.0"
+  },
+  "autoload":{
+    "psr-4":{
+      "Nicolassing\\SequenceBundle\\": ""
+    },
+    "exclude-from-classmap": [
+      "Tests/"
+    ]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
+}
