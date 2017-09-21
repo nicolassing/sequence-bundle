@@ -60,7 +60,7 @@ Configure the bundle:
 ```yaml
 # app/config/config.yml
 nicolassing_sequence:
-    user_class: AppBundle\Entity\Sequence
+    sequence_class: AppBundle\Entity\Sequence
 ```
 
 ## USAGE
