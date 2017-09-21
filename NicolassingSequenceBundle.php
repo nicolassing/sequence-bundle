@@ -3,7 +3,7 @@
 namespace Nicolassing\SequenceBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use SequenceBundle\DependencyInjection\Compiler\FormatterPass;
+use Nicolassing\SequenceBundle\DependencyInjection\Compiler\FormatterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

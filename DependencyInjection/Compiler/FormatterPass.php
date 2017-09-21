@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SequenceBundle\DependencyInjection\Compiler;
+namespace Nicolassing\SequenceBundle\DependencyInjection\Compiler;
 
 use Nicolassing\SequenceBundle\NumberFormatter\NumberFormatterChain;
 use Nicolassing\SequenceBundle\PrefixFormatter\PrefixFormatterChain;
