@@ -8,6 +8,10 @@
 
         <field name="index" column="seq_index" type="integer" />
 
+        <field name="type" column="seq_type" />
+
+        <field name="prefix" column="seq_prefix" nullable="true" />
+
         <field name="version" column="seq_version" type="integer" version="true" />
 
     </mapped-superclass>

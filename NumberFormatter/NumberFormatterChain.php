@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Nicolassing\SequenceBundle\NumberFormatter;
 
+use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterInterface;
+
 class NumberFormatterChain
 {
     private $formatters;
@@ -18,10 +20,10 @@ class NumberFormatterChain
         $this->formatters[$alias] = $formatter;
     }
 
-    public function getFormatter($alias) :NumberFormatterInterface
+    public function getFormatter($id) :NumberFormatterInterface
     {
-        if (array_key_exists($alias, $this->formatters)) {
-            return $this->formatters[$alias];
+        if (array_key_exists($id, $this->formatters)) {
+            return $this->formatters[$id];
         }
 
         return null;

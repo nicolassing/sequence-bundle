@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Nicolassing\SequenceBundle\NumberGenerator;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\EntityManager;
 use Nicolassing\SequenceBundle\Factory\SequenceFactoryInterface;
-use Nicolassing\SequenceBundle\NumberFormatter\NumberFormatterChain;
 use Nicolassing\SequenceBundle\Model\SequenceInterface;
-use Nicolassing\SequenceBundle\NumberFormatter\NumberFormatterInterface;
-use Nicolassing\SequenceBundle\PrefixFormatter\PrefixFormatterChain;
-use Nicolassing\SequenceBundle\PrefixFormatter\PrefixFormatterInterface;
+use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterInterface;
+use Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterInterface;
 
 final class NumberGenerator implements NumberGeneratorInterface
 {
@@ -27,79 +25,59 @@ final class NumberGenerator implements NumberGeneratorInterface
     private $sequenceFactory;
 
     /**
-     * @var ObjectManager
+     * @var EntityManager
      */
-    private $objectManager;
+    private $entityManager;
 
     /**
-     * @var NumberFormatterChain
+     * @var NumberFormatterInterface
      */
-    private $numberFormatterChain;
+    private $numberFormatter;
 
     /**
-     * @var PrefixFormatterChain
+     * @var PrefixFormatterInterface
      */
-    private $prefixFormatterChain;
+    private $prefixFormatter;
 
-    /**
-     * @var array
-     */
-    private $config;
-
-    /**
-     * @param ObjectRepository $sequenceRepository
-     * @param SequenceFactoryInterface $sequenceFactory
-     * @param ObjectManager $objectManager
-     * @param NumberFormatterChain $numberFormatterChain
-     * @param PrefixFormatterChain $prefixFormatterChain
-     * @param array $config
-     */
     public function __construct(
         ObjectRepository $sequenceRepository,
         SequenceFactoryInterface $sequenceFactory,
-        ObjectManager $objectManager,
-        NumberFormatterChain $numberFormatterChain,
-        PrefixFormatterChain $prefixFormatterChain,
-        array $config
+        EntityManager $entityManager,
+        NumberFormatterInterface $numberFormatter,
+        PrefixFormatterInterface $prefixFormatter
     ) {
         $this->sequenceRepository = $sequenceRepository;
         $this->sequenceFactory = $sequenceFactory;
-        $this->objectManager = $objectManager;
-        $this->numberFormatterChain = $numberFormatterChain;
-        $this->prefixFormatterChain = $prefixFormatterChain;
-        $this->config = $config;
+        $this->entityManager = $entityManager;
+        $this->numberFormatter = $numberFormatter;
+        $this->prefixFormatter = $prefixFormatter;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate(object $object, string $type): string
+    public function generate($object, string $type): string
     {
-        $config = $this->getConfig($type);
-        $prefix = $this->getPrefixFormatter($config['prefix_formatter'])->format($object, $config);
+        $prefix = $this->prefixFormatter->format($object);
         $sequence = $this->getSequence($type, $prefix);
-
-        if (!method_exists($this->objectManager, 'lock')) {
-            throw new \RuntimeException('Object manager must implement lock method.');
-        }
-
-        $this->objectManager->lock($sequence, LockMode::OPTIMISTIC, $sequence->getVersion());
+        $this->entityManager->lock($sequence, LockMode::OPTIMISTIC, $sequence->getVersion());
         $sequence->incrementIndex();
+        $this->entityManager->persist($sequence);
+        $this->entityManager->flush($sequence);
 
-        return $this->generateNumber($object, $sequence->getIndex(), $prefix, $config);
+        return $this->generateNumber($object, $sequence->getIndex(), $prefix);
     }
 
     /**
-     * @param object $object
+     * @param $object
      * @param int $index
      * @param string $prefix
-     * @param array $config
      *
      * @return string
      */
-    private function generateNumber(object $object, int $index, string $prefix, array $config): string
+    private function generateNumber($object, int $index, ?string $prefix): string
     {
-        return $prefix . $this->getNumberFormatter($config['number_formatter'])->format($object, $index, $config);
+        return $prefix . $this->numberFormatter->format($object, $index);
     }
 
     /**
@@ -118,54 +96,9 @@ final class NumberGenerator implements NumberGeneratorInterface
         }
 
         $sequence = $this->sequenceFactory->createNew($type, $prefix);
-        $this->objectManager->persist($sequence);
+        $this->entityManager->persist($sequence);
+        $this->entityManager->flush($sequence);
 
         return $sequence;
-    }
-
-    /**
-     * @param string $alias
-     *
-     * @return PrefixFormatterInterface
-     */
-    private function getPrefixFormatter(string $alias)
-    {
-        $formatter = $this->prefixFormatterChain->getFormatter($alias);
-
-        if (null === $formatter) {
-            throw new \LogicException(sprintf('Prefix formatter "%s" does not exist.', $alias));
-        }
-
-        return $formatter;
-    }
-
-    /**
-     * @param string $alias
-     *
-     * @return NumberFormatterInterface
-     */
-    private function getNumberFormatter(string $alias)
-    {
-        $formatter = $this->numberFormatterChain->getFormatter($alias);
-
-        if (null === $formatter) {
-            throw new \LogicException(sprintf('Number formatter "%s" does not exist.', $alias));
-        }
-
-        return $formatter;
-    }
-
-    /**
-     * @param string $type
-     *
-     * @return array
-     */
-    private function getConfig(string $type)
-    {
-        if (!array_key_exists($type, $this->config)) {
-            throw new \LogicException(sprintf('Type "%s" does not exist.', $type));
-        }
-
-        return $this->config[$type];
     }
 }

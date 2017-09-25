@@ -1,4 +1,6 @@
-[WIP] This bundle is heavily inspired by awesome Sylius Work ;)
+***[WIP] This bundle is under development. It's not suitable for production.***
+
+This bundle is heavily inspired by awesome Sylius Work ;)
 
 ## INSTALLATION via Composer
 

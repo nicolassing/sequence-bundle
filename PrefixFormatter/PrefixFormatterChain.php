@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Nicolassing\SequenceBundle\PrefixFormatter;
 
+use Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterInterface;
+
 class PrefixFormatterChain
 {
     private $formatters;

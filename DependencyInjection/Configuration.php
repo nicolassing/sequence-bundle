@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nicolassing\SequenceBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -24,8 +26,8 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('sequence_class')->isRequired()->cannotBeEmpty()->end()
-                ->scalarNode('model_manager_name')->defaultNull()->end()
-                ->append($this->getProvidersNode())
+                ->append($this->getNumberFormattersNode())
+                ->append($this->getPrefixFormattersNode())
             ->end()
         ;
 
@@ -35,19 +37,36 @@ class Configuration implements ConfigurationInterface
     /**
      * @return ArrayNodeDefinition
      */
-    private function getProvidersNode()
+    private function getNumberFormattersNode()
     {
         $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('types');
+        $node = $treeBuilder->root('number_formatters');
         $node
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->children()
-                    ->scalarNode('prefix')->defaultNull()->end()
-                    ->scalarNode('prefix_formatter')->defaultNull()->end()
-                    ->scalarNode('number_formatter')->defaultNull()->end()
-                    ->scalarNode('number_length')->defaultNull()->end()
+                    ->scalarNode('factory')->isRequired()->cannotBeEmpty()->end()
+                    ->variableNode('options')->defaultValue([])->end()
+                ->end()
+            ->end();
+        return $node;
+    }
+
+    /**
+     * @return ArrayNodeDefinition
+     */
+    private function getPrefixFormattersNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $node = $treeBuilder->root('prefix_formatters');
+        $node
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('name')
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('factory')->isRequired()->cannotBeEmpty()->end()
+                    ->variableNode('options')->defaultValue([])->end()
                 ->end()
             ->end();
         return $node;

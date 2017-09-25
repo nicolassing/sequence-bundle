@@ -28,12 +28,10 @@ class FormatterPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds($tag);
 
         foreach ($taggedServices as $id => $tags) {
-            foreach ($tags as $attributes) {
-                $definition->addMethodCall('addFormatter', array(
-                    new Reference($id),
-                    $attributes["alias"]
-                ));
-            }
+            $definition->addMethodCall('addFormatter', array(
+                new Reference($id),
+                $id
+            ));
         }
     }
 }

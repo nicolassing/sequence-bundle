@@ -7,10 +7,10 @@ namespace Nicolassing\SequenceBundle\NumberGenerator;
 interface NumberGeneratorInterface
 {
     /**
-     * @param object $object
+     * @param $object
      * @param string $type
      *
      * @return string
      */
-    public function generate(object $object, string $type): string;
+    public function generate($object, string $type): string;
 }
