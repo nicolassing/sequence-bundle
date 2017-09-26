@@ -30,7 +30,7 @@ class DefaultNumberFormatter extends AbstractFormatter implements NumberFormatte
     /**
      * @param array $options
      */
-    public function configure($options)
+    public function configure(array $options = [])
     {
         $resolver = new OptionsResolver();
         static::configureOptionResolver($resolver);
