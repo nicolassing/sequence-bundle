@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Nicolassing\SequenceBundle\DependencyInjection\Compiler;
 
-use Nicolassing\SequenceBundle\NumberFormatter\NumberFormatterChain;
-use Nicolassing\SequenceBundle\PrefixFormatter\PrefixFormatterChain;
+use Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterChain;
+use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterChain;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
