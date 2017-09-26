@@ -12,4 +12,10 @@ interface PrefixFormatterInterface
      * @return null|string
      */
     public function format($object) :?string;
+
+    /**
+     * @param array $options
+     * @param $formatterName
+     */
+    public static function validate(array $options, $formatterName);
 }
