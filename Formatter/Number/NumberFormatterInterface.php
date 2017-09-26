@@ -13,4 +13,10 @@ interface NumberFormatterInterface
      * @return string
      */
     public function format($object, int $index) :string;
+
+    /**
+     * @param array $options
+     * @param $formatterName
+     */
+    public static function validate(array $options, $formatterName);
 }

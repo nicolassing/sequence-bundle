@@ -5,9 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Nicolassing\SequenceBundle\Formatter\Number\Factory\DefaultNumberFormatterFactory" public="false"/>
+        <!--<service id="Nicolassing\SequenceBundle\Formatter\Number\Factory\DefaultNumberFormatterFactory" public="false"/>-->
 
-        <service id="Nicolassing\SequenceBundle\Formatter\Prefix\Factory\DefaultPrefixFormatterFactory" public="false"/>
+        <!--<service id="Nicolassing\SequenceBundle\Formatter\Prefix\Factory\DefaultPrefixFormatterFactory" public="false"/>-->
 
         <service id="nicolassing_sequence.orm.sequence_repository" class="Doctrine\ORM\EntityRepository" public="false">
             <factory service="doctrine" method="getRepository"/>

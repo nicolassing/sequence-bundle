@@ -46,7 +46,7 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->children()
-                    ->scalarNode('factory')->isRequired()->cannotBeEmpty()->end()
+                    ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
                     ->variableNode('options')->defaultValue([])->end()
                 ->end()
             ->end();
@@ -65,7 +65,7 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->children()
-                    ->scalarNode('factory')->isRequired()->cannotBeEmpty()->end()
+                    ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
                     ->variableNode('options')->defaultValue([])->end()
                 ->end()
             ->end();

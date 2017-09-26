@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Nicolassing\SequenceBundle\DependencyInjection;
 
-use Nicolassing\SequenceBundle\Formatter\Number\Factory\NumberFormatterFactoryInterface;
 use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterInterface;
-use Nicolassing\SequenceBundle\Formatter\Number\PrefixFormatterInterface;
-use Nicolassing\SequenceBundle\Formatter\Prefix\Factory\PrefixFormatterFactoryInterface;
+use Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -40,16 +38,15 @@ class NicolassingSequenceExtension extends Extension
     private function loadNumberFormatters(ContainerBuilder $container, array $config)
     {
         foreach ($config['number_formatters'] as $formatterName => $formatterConfig) {
-            $factoryService = $container->getDefinition($formatterConfig['factory']);
-            $factoryClass = $factoryService->getClass() ?: $formatterConfig['factory'];
-            if (!$this->implementsInterface(NumberFormatterFactoryInterface::class, $factoryClass)) {
-                throw new \LogicException(sprintf('Number formatter factory "%s" must implement %s', $formatterConfig['factory'], NumberFormatterFactoryInterface::class));
+            $formatterClass = $formatterConfig['class'];
+            if (!$this->implementsInterface(NumberFormatterInterface::class, $formatterClass)) {
+                throw new \LogicException(sprintf('Number formatter "%s" must implement %s', $formatterConfig['class'], NumberFormatterInterface::class));
             }
 
+            $formatterClass::validate($formatterConfig['options'], $formatterName);
             $serviceId = 'nicolassing_sequence.number_formatter.'.$formatterName;
             $container->register($serviceId, NumberFormatterInterface::class)
-                ->setFactory([$factoryClass, 'createFormatter'])
-                ->addArgument($formatterConfig['options'])
+                ->addMethodCall('configure', $formatterConfig['options'])
                 ->addTag('nicolassing_sequence.number_formatter');
         }
     }
@@ -57,17 +54,16 @@ class NicolassingSequenceExtension extends Extension
     private function loadPrefixFormatters(ContainerBuilder $container, array $config)
     {
         foreach ($config['prefix_formatters'] as $formatterName => $formatterConfig) {
-            $factoryService = $container->getDefinition($formatterConfig['factory']);
-            $factoryClass = $factoryService->getClass() ?: $formatterConfig['factory'];
-            if (!$this->implementsInterface(PrefixFormatterFactoryInterface::class, $factoryClass)) {
-                throw new \LogicException(sprintf('Prefix formatter factory "%s" must implement %s', $formatterConfig['factory'], NumberFormatterFactoryInterface::class));
+            $formatterClass = $formatterConfig['class'];
+            if (!$this->implementsInterface(PrefixFormatterInterface::class, $formatterClass)) {
+                throw new \LogicException(sprintf('Prefi formatter "%s" must implement %s', $formatterConfig['class'], NumberFormatterInterface::class));
             }
 
+            $formatterClass::validate($formatterConfig['options'], $formatterName);
             $serviceId = 'nicolassing_sequence.prefix_formatter.'.$formatterName;
-            $definition = $container->register($serviceId, PrefixFormatterInterface::class)
-                ->setFactory([$factoryClass, 'createFormatter'])
-                ->addArgument($formatterConfig['options']);
-            $definition->addTag('nicolassing_sequence.prefix_formatter');
+            $container->register($serviceId, PrefixFormatterInterface::class)
+                ->addMethodCall('configure', $formatterConfig['options'])
+                ->addTag('nicolassing_sequence.prefix_formatter');
         }
     }
 
