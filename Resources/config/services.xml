@@ -27,8 +27,8 @@
         <service id="nicolassing_sequence.generate_event_listener" class="Nicolassing\SequenceBundle\EventListener\GenerateListener" public="false">
             <argument type="service" id="annotations.reader"/>
             <argument type="service" id="nicolassing_sequence.number_generator_factory"/>
-            <argument type="service" id="Nicolassing\SequenceBundle\NumberFormatter\NumberFormatterChain"/>
-            <argument type="service" id="Nicolassing\SequenceBundle\PrefixFormatter\PrefixFormatterChain"/>
+            <argument type="service" id="Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterChain"/>
+            <argument type="service" id="Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterChain"/>
             <tag name="doctrine.event_listener" event="prePersist" lazy="true"/>
         </service>
     </services>
