@@ -8,8 +8,8 @@ use Doctrine\Common\Util\ClassUtils;
 use Nicolassing\SequenceBundle\Factory\NumberGeneratorFactoryInterface;
 use Nicolassing\SequenceBundle\Mapping\Annotation\Sequenceable;
 use Nicolassing\SequenceBundle\Mapping\Annotation\SequenceableField;
-use Nicolassing\SequenceBundle\NumberFormatter\NumberFormatterChain;
-use Nicolassing\SequenceBundle\PrefixFormatter\PrefixFormatterChain;
+use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterChain;
+use Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterChain;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class GenerateListener
