@@ -38,15 +38,15 @@ class NicolassingSequenceExtension extends Extension
     private function loadNumberFormatters(ContainerBuilder $container, array $config)
     {
         foreach ($config['number_formatters'] as $formatterName => $formatterConfig) {
+            /** @var NumberFormatterInterface $formatterClass */
             $formatterClass = $formatterConfig['class'];
             if (!$this->implementsInterface(NumberFormatterInterface::class, $formatterClass)) {
                 throw new \LogicException(sprintf('Number formatter "%s" must implement %s', $formatterConfig['class'], NumberFormatterInterface::class));
             }
-
             $formatterClass::validate($formatterConfig['options'], $formatterName);
             $serviceId = 'nicolassing_sequence.number_formatter.'.$formatterName;
-            $container->register($serviceId, NumberFormatterInterface::class)
-                ->addMethodCall('configure', $formatterConfig['options'])
+            $container->register($serviceId, $formatterClass)
+                ->addMethodCall('configure', array($formatterConfig['options']))
                 ->addTag('nicolassing_sequence.number_formatter');
         }
     }
@@ -54,15 +54,15 @@ class NicolassingSequenceExtension extends Extension
     private function loadPrefixFormatters(ContainerBuilder $container, array $config)
     {
         foreach ($config['prefix_formatters'] as $formatterName => $formatterConfig) {
+            /** @var PrefixFormatterInterface $formatterClass */
             $formatterClass = $formatterConfig['class'];
             if (!$this->implementsInterface(PrefixFormatterInterface::class, $formatterClass)) {
-                throw new \LogicException(sprintf('Prefi formatter "%s" must implement %s', $formatterConfig['class'], NumberFormatterInterface::class));
+                throw new \LogicException(sprintf('Prefix formatter "%s" must implement %s', $formatterConfig['class'], NumberFormatterInterface::class));
             }
-
             $formatterClass::validate($formatterConfig['options'], $formatterName);
             $serviceId = 'nicolassing_sequence.prefix_formatter.'.$formatterName;
-            $container->register($serviceId, PrefixFormatterInterface::class)
-                ->addMethodCall('configure', $formatterConfig['options'])
+            $container->register($serviceId, $formatterClass)
+                ->addMethodCall('configure', array($formatterConfig['options']))
                 ->addTag('nicolassing_sequence.prefix_formatter');
         }
     }

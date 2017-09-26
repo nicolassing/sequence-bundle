@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nicolassing\SequenceBundle\NumberFormatter;
-
-use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterInterface;
+namespace Nicolassing\SequenceBundle\Formatter\Number;
 
 class NumberFormatterChain
 {

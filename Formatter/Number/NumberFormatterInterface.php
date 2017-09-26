@@ -19,4 +19,9 @@ interface NumberFormatterInterface
      * @param $formatterName
      */
     public static function validate(array $options, $formatterName);
+
+    /**
+     * @param array $options
+     */
+    public function configure(array $options = []);
 }

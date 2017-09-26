@@ -5,10 +5,6 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <!--<service id="Nicolassing\SequenceBundle\Formatter\Number\Factory\DefaultNumberFormatterFactory" public="false"/>-->
-
-        <!--<service id="Nicolassing\SequenceBundle\Formatter\Prefix\Factory\DefaultPrefixFormatterFactory" public="false"/>-->
-
         <service id="nicolassing_sequence.orm.sequence_repository" class="Doctrine\ORM\EntityRepository" public="false">
             <factory service="doctrine" method="getRepository"/>
             <argument>%nicolassing_sequence.model.sequence.class%</argument>
@@ -18,9 +14,9 @@
             <argument>%nicolassing_sequence.model.sequence.class%</argument>
         </service>
 
-        <service id="Nicolassing\SequenceBundle\NumberFormatter\NumberFormatterChain" public="false"/>
+        <service id="Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterChain" public="false"/>
 
-        <service id="Nicolassing\SequenceBundle\PrefixFormatter\PrefixFormatterChain" public="false"/>
+        <service id="Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterChain" public="false"/>
 
         <service id="nicolassing_sequence.number_generator_factory" class="Nicolassing\SequenceBundle\Factory\NumberGeneratorFactory" public="false">
             <argument type="service" id="nicolassing_sequence.orm.sequence_repository" />

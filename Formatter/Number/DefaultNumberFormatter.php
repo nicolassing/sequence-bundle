@@ -24,14 +24,13 @@ class DefaultNumberFormatter extends AbstractFormatter implements NumberFormatte
      */
     public function format($object, int $index) :string
     {
-
         return str_pad((string) $index, $this->numberLength, $this->padString, STR_PAD_LEFT);
     }
 
     /**
      * @param array $options
      */
-    public function configure(array $options = [])
+    public function configure($options)
     {
         $resolver = new OptionsResolver();
         static::configureOptionResolver($resolver);
