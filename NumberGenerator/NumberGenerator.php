@@ -85,6 +85,7 @@ final class NumberGenerator implements NumberGeneratorInterface
      * @param null|string $prefix
      *
      * @return SequenceInterface
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function getSequence(string $type, ?string $prefix = null): SequenceInterface
     {
