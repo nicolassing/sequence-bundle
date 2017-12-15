@@ -21,15 +21,21 @@
         <service id="nicolassing_sequence.number_generator_factory" class="Nicolassing\SequenceBundle\Factory\NumberGeneratorFactory" public="false">
             <argument type="service" id="nicolassing_sequence.orm.sequence_repository" />
             <argument type="service" id="nicolassing_sequence.sequence_factory"/>
-            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
         </service>
 
         <service id="nicolassing_sequence.generate_event_listener" class="Nicolassing\SequenceBundle\EventListener\GenerateListener" public="false">
             <argument type="service" id="annotations.reader"/>
+            <argument type="service" id="event_dispatcher"/>
+            <tag name="doctrine.event_listener" event="prePersist" lazy="true"/>
+        </service>
+
+        <service id="nicolassing_sequence.event_listener.sequenceable_object_listener" class="Nicolassing\SequenceBundle\EventListener\SequenceableObjectListener" public="false">
+            <argument type="service" id="annotations.reader"/>
             <argument type="service" id="nicolassing_sequence.number_generator_factory"/>
             <argument type="service" id="Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterChain"/>
             <argument type="service" id="Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterChain"/>
-            <tag name="doctrine.event_listener" event="prePersist" lazy="true"/>
+            <tag name="kernel.event_listener" event="sequenceable_object.created" method="onSequenceableObjectCreated" lazy="true"/>
         </service>
     </services>
 </container>

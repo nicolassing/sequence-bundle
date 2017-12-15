@@ -5,75 +5,29 @@ namespace Nicolassing\SequenceBundle\EventListener;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Common\Util\ClassUtils;
-use Nicolassing\SequenceBundle\Factory\NumberGeneratorFactoryInterface;
+use Nicolassing\SequenceBundle\Events;
 use Nicolassing\SequenceBundle\Mapping\Annotation\Sequenceable;
-use Nicolassing\SequenceBundle\Mapping\Annotation\SequenceableField;
-use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterChain;
-use Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterChain;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
 
 class GenerateListener
 {
-    /**
-     * @var AnnotationReader
-     */
+    private $eventDisptacher;
     private $annotationReader;
 
-    /**
-     * @var NumberGeneratorFactoryInterface
-     */
-    private $numberGeneratorFactory;
-
-    /**
-     * @var NumberFormatterChain
-     */
-    private $numberFomatterChain;
-
-    /**
-     * @var PrefixFormatterChain
-     */
-    private $prefixFormatterChain;
-
-    public function __construct(
-        AnnotationReader $annotationReader,
-        NumberGeneratorFactoryInterface $numberGeneratorFactory,
-        NumberFormatterChain $numberFormatterChain,
-        PrefixFormatterChain $prefixFormatterChain
-    ) {
+    public function __construct(EventDispatcherInterface $eventDispatcher, AnnotationReader $annotationReader)
+    {
+        $this->eventDisptacher = $eventDispatcher;
         $this->annotationReader = $annotationReader;
-        $this->numberGeneratorFactory = $numberGeneratorFactory;
-        $this->numberFomatterChain = $numberFormatterChain;
-        $this->prefixFormatterChain = $prefixFormatterChain;
     }
 
     public function prePersist(LifecycleEventArgs $event)
     {
         $object = $event->getObject();
 
-        if (!$this->isSequenceable($object)) {
-            return;
+        if ($this->isSequenceable($object)) {
+            $this->eventDisptacher->dispatch(Events::SEQUENCEABLE_OBJECT_CREATED, new GenericEvent($object));
         }
-
-        $reflectionClass = new \ReflectionClass(ClassUtils::getClass($object));
-
-        foreach ($reflectionClass->getProperties() as $property) {
-            $sequenceableField = $this->annotationReader->getPropertyAnnotation($property, SequenceableField::class);
-
-            if ($sequenceableField === null) {
-                continue;
-            }
-
-            $numberGenerator = $numberGenerator = $this->numberGeneratorFactory->createNew(
-                $this->numberFomatterChain->getFormatter('nicolassing_sequence.number_formatter.' .$sequenceableField->getNumberFormatter()),
-                $this->prefixFormatterChain->getFormatter('nicolassing_sequence.prefix_formatter.' . $sequenceableField->getPrefixFormatter())
-            );
-
-            $number = $numberGenerator->generate($object, $sequenceableField->getType());
-            $accessor = PropertyAccess::createPropertyAccessor();
-            $accessor->setValue($object, $property->name, $number);
-        }
-
-        return false;
     }
 
 
@@ -87,6 +41,4 @@ class GenerateListener
 
         return false;
     }
-
-
 }
