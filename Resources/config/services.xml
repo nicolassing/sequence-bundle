@@ -25,8 +25,8 @@
         </service>
 
         <service id="nicolassing_sequence.generate_event_listener" class="Nicolassing\SequenceBundle\EventListener\GenerateListener" public="false">
-            <argument type="service" id="annotations.reader"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="annotations.reader"/>
             <tag name="doctrine.event_listener" event="prePersist" lazy="true"/>
         </service>
 
