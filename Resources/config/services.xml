@@ -23,7 +23,7 @@
             <argument type="service" id="nicolassing_sequence.handler_chain"/>
         </service>
 
-        <service id="nicolassing_sequence.generate_event_listener" class="SequenceableListener" public="false">
+        <service id="nicolassing_sequence.generate_event_listener" class="Nicolassing\SequenceBundle\EventListener\SequenceableListener" public="false">
             <argument type="service" id="annotations.reader"/>
             <argument type="service" id="nicolassing_sequence.number_generator"/>
             <tag name="doctrine.event_listener" event="prePersist" lazy="true"/>
