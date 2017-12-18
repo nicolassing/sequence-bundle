@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Nicolassing\SequenceBundle\Factory;
 
 use Nicolassing\SequenceBundle\Model\SequenceInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SequenceFactory implements SequenceFactoryInterface
 {

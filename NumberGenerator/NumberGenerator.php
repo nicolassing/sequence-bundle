@@ -8,9 +8,9 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
 use Nicolassing\SequenceBundle\Factory\SequenceFactoryInterface;
+use Nicolassing\SequenceBundle\Handler\HandlerChain;
+use Nicolassing\SequenceBundle\Model\Sequence;
 use Nicolassing\SequenceBundle\Model\SequenceInterface;
-use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterInterface;
-use Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterInterface;
 
 final class NumberGenerator implements NumberGeneratorInterface
 {
@@ -30,27 +30,25 @@ final class NumberGenerator implements NumberGeneratorInterface
     private $entityManager;
 
     /**
-     * @var NumberFormatterInterface
+     * @var HandlerChain
      */
-    private $numberFormatter;
+    private $handlerChain;
 
     /**
-     * @var PrefixFormatterInterface
+     * @var array|Sequence[]
      */
-    private $prefixFormatter;
+    private $sequences = array();
 
     public function __construct(
         ObjectRepository $sequenceRepository,
         SequenceFactoryInterface $sequenceFactory,
         EntityManager $entityManager,
-        NumberFormatterInterface $numberFormatter,
-        PrefixFormatterInterface $prefixFormatter
+        HandlerChain $handlerChain
     ) {
         $this->sequenceRepository = $sequenceRepository;
         $this->sequenceFactory = $sequenceFactory;
         $this->entityManager = $entityManager;
-        $this->numberFormatter = $numberFormatter;
-        $this->prefixFormatter = $prefixFormatter;
+        $this->handlerChain = $handlerChain;
     }
 
     /**
@@ -58,26 +56,13 @@ final class NumberGenerator implements NumberGeneratorInterface
      */
     public function generate($object, string $type): string
     {
-        $prefix = $this->prefixFormatter->format($object);
+        $handler = $this->handlerChain->getHandler($type);
+        $prefix = $handler->getPrefix($object);
         $sequence = $this->getSequence($type, $prefix);
         $this->entityManager->lock($sequence, LockMode::OPTIMISTIC, $sequence->getVersion());
         $sequence->incrementIndex();
-        $this->entityManager->persist($sequence);
-        $this->entityManager->flush($sequence);
 
-        return $this->generateNumber($object, $sequence->getIndex(), $prefix);
-    }
-
-    /**
-     * @param $object
-     * @param int $index
-     * @param string $prefix
-     *
-     * @return string
-     */
-    private function generateNumber($object, int $index, ?string $prefix): string
-    {
-        return $prefix . $this->numberFormatter->format($object, $index);
+        return $handler->format($object, $sequence->getIndex());
     }
 
     /**
@@ -85,20 +70,22 @@ final class NumberGenerator implements NumberGeneratorInterface
      * @param null|string $prefix
      *
      * @return SequenceInterface
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function getSequence(string $type, ?string $prefix = null): SequenceInterface
     {
+        if (array_key_exists($type.$prefix, $this->sequences)) {
+            return $this->sequences[$type.$prefix];
+        }
+
         /** @var SequenceInterface $sequence */
         $sequence = $this->sequenceRepository->findOneBy(['type' => $type, 'prefix' => $prefix]);
 
-        if (null !== $sequence) {
-            return $sequence;
+        if (null === $sequence) {
+            $sequence = $this->sequenceFactory->createNew($type, $prefix);
+            $this->entityManager->persist($sequence);
         }
 
-        $sequence = $this->sequenceFactory->createNew($type, $prefix);
-        $this->entityManager->persist($sequence);
-        $this->entityManager->flush($sequence);
+        $this->sequences[$type.$prefix] = $sequence;
 
         return $sequence;
     }

@@ -14,28 +14,19 @@
             <argument>%nicolassing_sequence.model.sequence.class%</argument>
         </service>
 
-        <service id="Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterChain" public="false"/>
+        <service id="nicolassing_sequence.handler_chain" class="Nicolassing\SequenceBundle\Handler\HandlerChain" public="false"/>
 
-        <service id="Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterChain" public="false"/>
-
-        <service id="nicolassing_sequence.number_generator_factory" class="Nicolassing\SequenceBundle\Factory\NumberGeneratorFactory" public="false">
-            <argument type="service" id="nicolassing_sequence.orm.sequence_repository" />
+        <service id="nicolassing_sequence.number_generator" class="Nicolassing\SequenceBundle\NumberGenerator\NumberGenerator">
+            <argument type="service" id="nicolassing_sequence.orm.sequence_repository"/>
             <argument type="service" id="nicolassing_sequence.sequence_factory"/>
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            <argument type="service" id="nicolassing_sequence.handler_chain"/>
         </service>
 
-        <service id="nicolassing_sequence.generate_event_listener" class="Nicolassing\SequenceBundle\EventListener\GenerateListener" public="false">
-            <argument type="service" id="event_dispatcher"/>
+        <service id="nicolassing_sequence.generate_event_listener" class="SequenceableListener" public="false">
             <argument type="service" id="annotations.reader"/>
+            <argument type="service" id="nicolassing_sequence.number_generator"/>
             <tag name="doctrine.event_listener" event="prePersist" lazy="true"/>
-        </service>
-
-        <service id="nicolassing_sequence.event_listener.sequenceable_object_listener" class="Nicolassing\SequenceBundle\EventListener\SequenceableObjectListener" public="false">
-            <argument type="service" id="annotations.reader"/>
-            <argument type="service" id="nicolassing_sequence.number_generator_factory"/>
-            <argument type="service" id="Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterChain"/>
-            <argument type="service" id="Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterChain"/>
-            <tag name="kernel.event_listener" event="sequenceable_object.created" method="onSequenceableObjectCreated" lazy="true"/>
         </service>
     </services>
 </container>

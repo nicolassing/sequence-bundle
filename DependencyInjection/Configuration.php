@@ -26,8 +26,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('sequence_class')->isRequired()->cannotBeEmpty()->end()
-                ->append($this->getNumberFormattersNode())
-                ->append($this->getPrefixFormattersNode())
+                ->append($this->getHandlersNode())
             ->end()
         ;
 
@@ -37,37 +36,42 @@ class Configuration implements ConfigurationInterface
     /**
      * @return ArrayNodeDefinition
      */
-    private function getNumberFormattersNode()
+    private function getHandlersNode()
     {
         $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('number_formatters');
+        $node = $treeBuilder->root('handlers');
         $node
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->children()
-                    ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-                    ->variableNode('options')->defaultValue([])->end()
+                    ->scalarNode('type')
+                        ->isRequired()
+                        ->treatNullLike('null')
+                        ->beforeNormalization()
+                            ->always()
+                            ->then(function ($v) { return strtolower($v); })
+                        ->end()
+                    ->end()
+                    ->scalarNode('id')->end() // service
+                    ->integerNode('length')->defaultValue(9)->end() // default
+                    ->scalarNode('prefix')->defaultNull()->end() // default
                 ->end()
-            ->end();
-        return $node;
-    }
-
-    /**
-     * @return ArrayNodeDefinition
-     */
-    private function getPrefixFormattersNode()
-    {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('prefix_formatters');
-        $node
-            ->requiresAtLeastOneElement()
-            ->useAttributeAsKey('name')
-            ->prototype('array')
-                ->children()
-                    ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-                    ->variableNode('options')->defaultValue([])->end()
+                ->validate()
+                    ->ifTrue(function ($v) { return 'service' === $v['type'] && empty($v['id']); })
+                    ->thenInvalid('If you use service handler you must provide and id.')
                 ->end()
+                ->example(array(
+                    'default' => array(
+                        'type' => 'default',
+                        'length' => '3',
+                        'prefix' => 'NA',
+                        ),
+                    'invoice' => array(
+                        'type' => 'service',
+                        'id' => 'my_handler',
+                        ),
+                    ))
             ->end();
         return $node;
     }

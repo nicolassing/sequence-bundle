@@ -8,11 +8,7 @@ namespace Nicolassing\SequenceBundle\Mapping\Annotation;
  */
 class SequenceableField
 {
-    private $numberFormatter = 'default';
-
-    private $prefixFormatter = 'default';
-
-    private $type = null;
+    private $type;
 
     public function __construct(array $options)
     {
@@ -26,23 +22,7 @@ class SequenceableField
     }
 
     /**
-     * @return mixed
-     */
-    public function getNumberFormatter()
-    {
-        return $this->numberFormatter;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPrefixFormatter()
-    {
-        return $this->prefixFormatter;
-    }
-
-    /**
-     * @return null
+     * @return string
      */
     public function getType()
     {

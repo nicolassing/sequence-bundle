@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Nicolassing\SequenceBundle\DependencyInjection;
 
-use Nicolassing\SequenceBundle\Formatter\Number\NumberFormatterInterface;
-use Nicolassing\SequenceBundle\Formatter\Prefix\PrefixFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -31,53 +30,56 @@ class NicolassingSequenceExtension extends Extension
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
-        $this->loadNumberFormatters($container, $config);
-        $this->loadPrefixFormatters($container, $config);
-    }
-
-    private function loadNumberFormatters(ContainerBuilder $container, array $config)
-    {
-        foreach ($config['number_formatters'] as $formatterName => $formatterConfig) {
-            /** @var NumberFormatterInterface $formatterClass */
-            $formatterClass = $formatterConfig['class'];
-            if (!$this->implementsInterface(NumberFormatterInterface::class, $formatterClass)) {
-                throw new \LogicException(sprintf('Number formatter "%s" must implement %s', $formatterConfig['class'], NumberFormatterInterface::class));
-            }
-            $formatterClass::validate($formatterConfig['options'], $formatterName);
-            $serviceId = 'nicolassing_sequence.number_formatter.'.$formatterName;
-            $container->register($serviceId, $formatterClass)
-                ->addMethodCall('configure', array($formatterConfig['options']))
-                ->addTag('nicolassing_sequence.number_formatter');
+        foreach ($config['handlers'] as $name => $handler) {
+            $this->buildHandler($container, $name, $handler);
         }
     }
 
-    private function loadPrefixFormatters(ContainerBuilder $container, array $config)
+    private function buildHandler(ContainerBuilder $container, $name, array $handler)
     {
-        foreach ($config['prefix_formatters'] as $formatterName => $formatterConfig) {
-            /** @var PrefixFormatterInterface $formatterClass */
-            $formatterClass = $formatterConfig['class'];
-            if (!$this->implementsInterface(PrefixFormatterInterface::class, $formatterClass)) {
-                throw new \LogicException(sprintf('Prefix formatter "%s" must implement %s', $formatterConfig['class'], NumberFormatterInterface::class));
-            }
-            $formatterClass::validate($formatterConfig['options'], $formatterName);
-            $serviceId = 'nicolassing_sequence.prefix_formatter.'.$formatterName;
-            $container->register($serviceId, $formatterClass)
-                ->addMethodCall('configure', array($formatterConfig['options']))
-                ->addTag('nicolassing_sequence.prefix_formatter');
+        $handlerId = $this->getHandlerId($name);
+
+        if ('service' === $handler['type']) {
+            $container->setAlias($handlerId, $handler['id']);
+
+            return $handlerId;
         }
+
+        $definition = new Definition($this->getHandlerClassByType($handler['type']));
+        $definition->setPublic(false);
+        $definition->addTag('nicolassing_sequence.handler', array('name' => $name));
+
+        switch ($handler['type']) {
+            case 'default':
+                $definition->setArguments(array(
+                    $handler['prefix'],
+                    $handler['length']
+                ));
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Invalid handler type "%s" given for handler "%s"', $handler['type'], $name));
+        }
+
+        $container->setDefinition($handlerId, $definition);
+
+        return $handlerId;
     }
 
-    /**
-     * @param $interface
-     * @param $class
-     *
-     * @return bool
-     */
-    private function implementsInterface($interface, $class): bool
+    private function getHandlerId($name)
     {
-        if (false === $interfaces = class_implements($class)) {
-            return false;
+        return sprintf('nicolassing_sequence.handler.%s', $name);
+    }
+
+    private function getHandlerClassByType($handlerType)
+    {
+        $typeToClassMapping = array(
+            'default' => 'Nicolassing\SequenceBundle\Handler\DefaultHandler',
+        );
+
+        if (!isset($typeToClassMapping[$handlerType])) {
+            throw new \InvalidArgumentException(sprintf('There is no handler class defined for handler "%s".', $handlerType));
         }
-        return in_array($interface, $interfaces);
+
+        return $typeToClassMapping[$handlerType];
     }
 }

@@ -3,7 +3,7 @@
 namespace Nicolassing\SequenceBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Nicolassing\SequenceBundle\DependencyInjection\Compiler\FormatterPass;
+use Nicolassing\SequenceBundle\DependencyInjection\Compiler\HandlerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -31,6 +31,6 @@ class NicolassingSequenceBundle extends Bundle
             $container->addCompilerPass(DoctrineOrmMappingsPass::createXmlMappingDriver($mappings));
         }
 
-        $container->addCompilerPass(new FormatterPass());
+        $container->addCompilerPass(new HandlerPass());
     }
 }
