@@ -1,0 +1,7 @@
+nicolassing_sequence:
+    sequence_class: 'Foo\Bar'
+    handlers:
+        test:
+            type: default
+            length: 9
+            prefix: PF

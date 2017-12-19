@@ -1,0 +1,6 @@
+nicolassing_sequence:
+    sequence_class: 'Foo\Bar'
+    handlers:
+        test:
+            type: service
+            id: 'my_handler'
