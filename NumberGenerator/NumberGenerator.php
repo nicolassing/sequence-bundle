@@ -7,6 +7,7 @@ namespace Nicolassing\SequenceBundle\NumberGenerator;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Nicolassing\SequenceBundle\Factory\SequenceFactoryInterface;
 use Nicolassing\SequenceBundle\Handler\HandlerChain;
 use Nicolassing\SequenceBundle\Model\Sequence;
@@ -42,7 +43,7 @@ final class NumberGenerator implements NumberGeneratorInterface
     public function __construct(
         ObjectRepository $sequenceRepository,
         SequenceFactoryInterface $sequenceFactory,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         HandlerChain $handlerChain
     ) {
         $this->sequenceRepository = $sequenceRepository;
