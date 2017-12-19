@@ -33,7 +33,8 @@ class NumberGeneratorTest extends TestCase
         $handlerChain = $this->createMock(HandlerChain::class);
         $handlerChain->expects($this->once())->method('getHandler')->willReturn($handler);
 
-        $object = new class{};
+        $object = new class {
+        };
 
         $numberGenerator = new NumberGenerator($objectRepository, $sequenceFactory, $entityManager, $handlerChain);
         $number = $numberGenerator->generate($object, 'test');

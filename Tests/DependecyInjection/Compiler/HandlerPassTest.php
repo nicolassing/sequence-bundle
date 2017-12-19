@@ -30,7 +30,7 @@ class HandlerPassTest extends TestCase
         $handlerPass = new HandlerPass();
         $handlerPass->process($container);
 
-        $this->assertCount( 1, $container->getDefinition('nicolassing_sequence.handler_chain')->getMethodCalls());
+        $this->assertCount(1, $container->getDefinition('nicolassing_sequence.handler_chain')->getMethodCalls());
         $this->assertEquals($container->getDefinition('nicolassing_sequence.handler_chain')->getMethodCalls()[0][1][1], 'foo');
     }
 }
