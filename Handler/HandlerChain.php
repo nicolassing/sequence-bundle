@@ -13,15 +13,15 @@ class HandlerChain
         $this->handlers = array();
     }
 
-    public function addHandler(HandlerInterface $handler, $name) :void
+    public function addHandler(HandlerInterface $handler, $id) :void
     {
-        $this->handlers[$name] = $handler;
+        $this->handlers[$id] = $handler;
     }
 
-    public function getHandler($name) :HandlerInterface
+    public function getHandler($id) :HandlerInterface
     {
-        if (array_key_exists($name, $this->handlers)) {
-            return $this->handlers[$name];
+        if (array_key_exists($id, $this->handlers)) {
+            return $this->handlers[$id];
         }
 
         return null;

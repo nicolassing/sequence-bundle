@@ -47,7 +47,7 @@ class NicolassingSequenceExtension extends Extension
 
         $definition = new Definition($this->getHandlerClassByType($handler['type']));
         $definition->setPublic(false);
-        $definition->addTag('nicolassing_sequence.handler', array('name' => $name));
+        $definition->addTag('nicolassing_sequence.handler', array('alias' => $name));
 
         switch ($handler['type']) {
             case 'default':

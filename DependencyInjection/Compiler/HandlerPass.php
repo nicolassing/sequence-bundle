@@ -23,7 +23,7 @@ class HandlerPass implements CompilerPassInterface
             foreach ($tags as $tag) {
                 $definition->addMethodCall('addHandler', array(
                     new Reference($id),
-                    $tag['name']
+                    $tag['alias']
                 ));
             }
         }
