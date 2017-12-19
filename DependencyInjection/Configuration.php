@@ -50,7 +50,9 @@ class Configuration implements ConfigurationInterface
                         ->treatNullLike('null')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function ($v) { return strtolower($v); })
+                            ->then(function ($v) {
+                                return strtolower($v);
+                            })
                         ->end()
                     ->end()
                     ->scalarNode('id')->end() // service
@@ -58,7 +60,9 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('prefix')->defaultNull()->end() // default
                 ->end()
                 ->validate()
-                    ->ifTrue(function ($v) { return 'service' === $v['type'] && empty($v['id']); })
+                    ->ifTrue(function ($v) {
+                        return 'service' === $v['type'] && empty($v['id']);
+                    })
                     ->thenInvalid('If you use service handler you must provide and id.')
                 ->end()
                 ->example(array(

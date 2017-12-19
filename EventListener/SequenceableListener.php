@@ -23,7 +23,8 @@ class SequenceableListener
     private $numberGenerator;
 
 
-    public function __construct(AnnotationReader $annotationReader, NumberGeneratorInterface $numberGenerator) {
+    public function __construct(AnnotationReader $annotationReader, NumberGeneratorInterface $numberGenerator)
+    {
         $this->annotationReader = $annotationReader;
         $this->numberGenerator = $numberGenerator;
     }
@@ -36,8 +37,10 @@ class SequenceableListener
             $reflectionClass = new \ReflectionClass(ClassUtils::getClass($object));
 
             foreach ($reflectionClass->getProperties() as $property) {
-                $sequenceableField = $this->annotationReader->getPropertyAnnotation($property,
-                    SequenceableField::class);
+                $sequenceableField = $this->annotationReader->getPropertyAnnotation(
+                    $property,
+                    SequenceableField::class
+                );
 
                 if ($sequenceableField instanceof SequenceableField) {
                     $number = $this->numberGenerator->generate($object, $sequenceableField->getType());
