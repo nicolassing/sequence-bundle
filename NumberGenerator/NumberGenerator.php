@@ -61,7 +61,6 @@ final class NumberGenerator implements NumberGeneratorInterface
         $prefix = $handler->getPrefix($object);
         $sequence = $this->getSequence($type, $prefix);
         $this->entityManager->lock($sequence, LockMode::OPTIMISTIC, $sequence->getVersion());
-        $sequence->incrementIndex();
 
         return $handler->format($object, $sequence->getIndex());
     }
@@ -75,7 +74,12 @@ final class NumberGenerator implements NumberGeneratorInterface
     private function getSequence(string $type, ?string $prefix = null): SequenceInterface
     {
         if (array_key_exists($type.$prefix, $this->sequences)) {
-            return $this->sequences[$type.$prefix];
+            $sequence = $this->sequences[$type.$prefix];
+            $sequence->incrementIndex();
+            $this->sequences[$type.$prefix] = $sequence;
+            $this->entityManager->persist($sequence);
+
+            return $sequence;
         }
 
         /** @var SequenceInterface $sequence */
