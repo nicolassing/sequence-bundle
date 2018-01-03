@@ -77,6 +77,7 @@ final class NumberGenerator implements NumberGeneratorInterface
         }
 
         $this->entityManager->persist($sequence);
+        $this->entityManager->flush($sequence);
 
         return $sequence;
     }
