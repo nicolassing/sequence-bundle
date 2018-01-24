@@ -35,6 +35,11 @@ final class NumberGenerator implements NumberGeneratorInterface
      */
     private $handlerChain;
 
+    /**
+     * @var array
+     */
+    private $sequences = [];
+
     public function __construct(
         ObjectRepository $sequenceRepository,
         SequenceFactoryInterface $sequenceFactory,
@@ -55,7 +60,6 @@ final class NumberGenerator implements NumberGeneratorInterface
         $handler = $this->handlerChain->getHandler($type);
         $prefix = $handler->getPrefix($object);
         $sequence = $this->getSequence($type, $prefix);
-        $sequence->incrementIndex();
         $this->entityManager->lock($sequence, LockMode::OPTIMISTIC, $sequence->getVersion());
 
         return $handler->format($object, $sequence->getIndex());
@@ -69,6 +73,14 @@ final class NumberGenerator implements NumberGeneratorInterface
      */
     private function getSequence(string $type, ?string $prefix = null): SequenceInterface
     {
+        if (isset($this->sequences[$type.$prefix])) {
+            $sequence = $this->sequences[$type.$prefix];
+            $sequence->incrementIndex();
+            $this->entityManager->persist($sequence);
+
+            return $sequence;
+        }
+
         /** @var SequenceInterface $sequence */
         $sequence = $this->sequenceRepository->findOneBy(['type' => $type, 'prefix' => $prefix]);
 
@@ -76,8 +88,9 @@ final class NumberGenerator implements NumberGeneratorInterface
             $sequence = $this->sequenceFactory->createNew($type, $prefix);
         }
 
+        $sequence->incrementIndex();
         $this->entityManager->persist($sequence);
-        $this->entityManager->flush($sequence);
+        $this->sequences[$type.$prefix] = $sequence;
 
         return $sequence;
     }
