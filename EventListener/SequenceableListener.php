@@ -43,9 +43,12 @@ class SequenceableListener
                 );
 
                 if ($sequenceableField instanceof SequenceableField) {
-                    $number = $this->numberGenerator->generate($object, $sequenceableField->getType());
                     $accessor = PropertyAccess::createPropertyAccessor();
-                    $accessor->setValue($object, $property->name, $number);
+
+                    if (null === $accessor->getValue($object, $property->name)) {
+                        $number = $this->numberGenerator->generate($object, $sequenceableField->getType());
+                        $accessor->setValue($object, $property->name, $number);
+                    }
                 }
             }
         }
